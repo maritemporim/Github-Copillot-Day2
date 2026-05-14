@@ -1,17 +1,13 @@
 package com.socops.service;
 
-import com.socops.model.BingoCell;
-import com.socops.model.WinningStreak;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import com.socops.model.BingoCell;
+import com.socops.model.WinningStreak;
 
 /**
  * Validates board assembly, cell flipping, and victory detection
@@ -25,7 +21,7 @@ class BoardAssemblerTests {
     @DisplayName("Assembled board contains exactly twenty-five cells")
     void assembledBoardHasTwentyFiveCells() {
         List<BingoCell> generatedBoard = BoardAssembler.assembleNewBoard();
-        assertEquals(25, generatedBoard.size(),
+        Assertions.assertEquals(25, generatedBoard.size(),
                 "A standard bingo grid must hold 25 tiles");
     }
 
@@ -35,8 +31,8 @@ class BoardAssemblerTests {
         List<BingoCell> generatedBoard = BoardAssembler.assembleNewBoard();
         BingoCell centreTile = generatedBoard.get(12);
 
-        assertTrue(centreTile.freeCell(),  "Centre tile must be flagged as free");
-        assertTrue(centreTile.selected(),  "Free cell must start already tapped");
+        Assertions.assertTrue(centreTile.freeCell(),  "Centre tile must be flagged as free");
+        Assertions.assertTrue(centreTile.selected(),  "Free cell must start already tapped");
     }
 
     @Test
@@ -45,7 +41,7 @@ class BoardAssemblerTests {
         List<BingoCell> generatedBoard = BoardAssembler.assembleNewBoard();
         for (BingoCell tile : generatedBoard) {
             if (!tile.freeCell()) {
-                assertFalse(tile.selected(),
+                Assertions.assertFalse(tile.selected(),
                         "Tile id=" + tile.id() + " should begin unselected");
             }
         }
@@ -60,11 +56,11 @@ class BoardAssemblerTests {
         int targetId = 0;
 
         List<BingoCell> afterFirstFlip = BoardAssembler.flipCell(board, targetId);
-        assertTrue(afterFirstFlip.get(targetId).selected(),
+        Assertions.assertTrue(afterFirstFlip.get(targetId).selected(),
                 "First flip should mark the cell as selected");
 
         List<BingoCell> afterSecondFlip = BoardAssembler.flipCell(afterFirstFlip, targetId);
-        assertFalse(afterSecondFlip.get(targetId).selected(),
+        Assertions.assertFalse(afterSecondFlip.get(targetId).selected(),
                 "Second flip should revert the cell to unselected");
     }
 
@@ -75,9 +71,9 @@ class BoardAssemblerTests {
         int freeCellId = 12;
 
         List<BingoCell> afterAttemptedFlip = BoardAssembler.flipCell(board, freeCellId);
-        assertTrue(afterAttemptedFlip.get(freeCellId).selected(),
+        Assertions.assertTrue(afterAttemptedFlip.get(freeCellId).selected(),
                 "Free cell must remain selected even after a flip attempt");
-        assertTrue(afterAttemptedFlip.get(freeCellId).freeCell(),
+        Assertions.assertTrue(afterAttemptedFlip.get(freeCellId).freeCell(),
                 "Free cell flag must not change");
     }
 
@@ -94,10 +90,10 @@ class BoardAssemblerTests {
         }
 
         Optional<WinningStreak> result = BoardAssembler.detectWinningStreak(board);
-        assertTrue(result.isPresent(), "A full row should trigger a victory");
-        assertEquals("row", result.get().direction(),
+        Assertions.assertTrue(result.isPresent(), "A full row should trigger a victory");
+        Assertions.assertEquals("row", result.get().direction(),
                 "The detected streak direction should be 'row'");
-        assertEquals(0, result.get().index(),
+        Assertions.assertEquals(0, result.get().index(),
                 "The winning row index should be 0");
     }
 
@@ -106,7 +102,7 @@ class BoardAssemblerTests {
     void incompleteBoardHasNoVictory() {
         List<BingoCell> freshBoard = BoardAssembler.assembleNewBoard();
         Optional<WinningStreak> result = BoardAssembler.detectWinningStreak(freshBoard);
-        assertTrue(result.isEmpty(),
+        Assertions.assertTrue(result.isEmpty(),
                 "No streak should be found on a brand-new board");
     }
 
@@ -117,7 +113,7 @@ class BoardAssemblerTests {
         WinningStreak fakeStreak = new WinningStreak("row", 0, expectedPositions);
 
         Set<Integer> collectedIds = BoardAssembler.collectWinningCellIds(fakeStreak);
-        assertEquals(Set.of(0, 1, 2, 3, 4), collectedIds,
+        Assertions.assertEquals(Set.of(0, 1, 2, 3, 4), collectedIds,
                 "Collected IDs must match the streak's cell positions");
     }
 }
